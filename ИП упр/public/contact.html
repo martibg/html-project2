@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Контакт</title>
+  <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+<main class="container">
+  <article class="page-content">
+    <section>
+      <form id="contactForm" class="contact-form">
+        <label>Име<br><input type="text" name="name" id="name" required></label>
+        <label>Имейл<br><input type="email" name="email" id="email" required></label>
+        <label>Съобщение<br><textarea name="message" id="message" rows="5" required></textarea></label>
+        <button type="submit">Изпрати</button>
+      </form>
+
+      <div id="result" aria-live="polite"></div>
+    </section>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <img src="https://aspopov.bg/wp-content/uploads/2024/01/popov-logo-2023-1.webp" alt="Лого на ПГВТ &quot;А.С.Попов&quot;" class="school-logo">
+    <p>© "ПГВТ А.С.Попов" — Всички права запазени</p>
+  </div>
+</footer>
+
+<script>
+
+document.getElementById('contactForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    message: document.getElementById('message').value.trim()
+  };
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.textContent = 'Изпращане...';
+
+  try {
+    const res = await fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) throw new Error('Сървърът върна грешка');
+    const json = await res.json();
+    if (json.status === 'ok'){
+      resultDiv.textContent = 'Благодаря! Вашето съобщение е получено.';
+      document.getElementById('contactForm').reset();
+    } else {
+      resultDiv.textContent = 'Възникна проблем при изпращане. Опитайте по-късно.';
+    }
+  } catch (err){
+    console.error(err);
+    resultDiv.textContent = 'Грешка при връзката със сървъра.';
+  }
+});
+</script>
+</body>
+</html>
